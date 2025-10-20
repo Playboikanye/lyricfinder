@@ -18,19 +18,50 @@ const Index = () => {
     setIsLoading(true);
     setLyrics(null);
 
-    // Simulate API call - Replace this with actual API integration
-    setTimeout(() => {
-      toast.info("Please integrate with a lyrics API to fetch actual lyrics");
+    try {
+      // Parse query - expect format like "Artist - Song" or just "Song"
+      let artist = "";
+      let title = "";
       
-      // Demo data
-      setLyrics({
-        title: query,
-        artist: "Demo Artist",
-        lyrics: `This is a demo.\n\nTo get actual lyrics, you need to:\n1. Sign up for a lyrics API (Genius, Musixmatch, or Lyrics.ovh)\n2. Add your API key\n3. Implement the API call\n\nThe UI is ready for integration!`,
-        language: language !== "all" ? language : "English",
-      });
+      if (query.includes("-")) {
+        const parts = query.split("-").map(p => p.trim());
+        artist = parts[0];
+        title = parts[1] || parts[0];
+      } else {
+        title = query.trim();
+        artist = "Unknown";
+      }
+
+      // Fetch from Lyrics.ovh API
+      const response = await fetch(
+        `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Lyrics not found");
+      }
+
+      const data = await response.json();
+
+      if (data.lyrics) {
+        setLyrics({
+          title: title,
+          artist: artist,
+          lyrics: data.lyrics,
+          language: language !== "all" ? language : undefined,
+        });
+        toast.success("Lyrics found!");
+      } else {
+        throw new Error("No lyrics available");
+      }
+    } catch (error) {
+      toast.error(
+        "Could not find lyrics. Try format: 'Artist - Song Title' (e.g., 'Coldplay - Yellow')"
+      );
+      setLyrics(null);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (

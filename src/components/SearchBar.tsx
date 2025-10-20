@@ -26,7 +26,7 @@ export const SearchBar = ({ onSearch, isLoading }: SearchBarProps) => {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <Input
             type="text"
-            placeholder="Search for any song lyrics..."
+            placeholder="Search lyrics (e.g., 'Coldplay - Yellow' or 'Yellow')"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="pl-12 pr-32 h-14 text-lg bg-card border-border focus-visible:ring-primary focus-visible:border-primary transition-all"
